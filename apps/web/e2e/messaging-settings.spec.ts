@@ -16,7 +16,7 @@ test("messaging settings show linked chat apps, channels, and connections", asyn
       body: JSON.stringify({
         json: {
           enabled: true,
-          providers: ["sendblue", "slack", "whatsapp", "telegram"],
+          providers: ["sendblue", "slack", "whatsapp", "telegram", "lark"],
           openSignup: false,
           identities: [
             {
@@ -85,7 +85,7 @@ test("messaging settings show linked chat apps, channels, and connections", asyn
   await page.getByRole("button", { name: "Manage messaging settings" }).click();
 
   await expect(page.getByTestId("messaging-settings")).toBeVisible();
-  await expect(page.getByText("iMessage · Slack · WhatsApp · Telegram")).toBeVisible();
+  await expect(page.getByText("iMessage · Slack · WhatsApp · Telegram · Feishu")).toBeVisible();
   await expect(page.getByText("iMessage · +15551230001")).toBeVisible();
   await expect(page.getByText("→ Chief")).toBeVisible();
   await expect(page.getByRole("button", { name: "Unlink" })).toBeVisible();
