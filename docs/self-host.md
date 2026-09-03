@@ -78,8 +78,17 @@ After `--prepare-only`, edit `.env` then rerun `bash install-images.sh` (or
 pairing is unchanged — set both tags to the same published multi-arch release
 (see [Published images and tags](#published-images-and-tags)).
 
-`postgres:16` and `busybox:1` still pull from Docker Hub. Stage C does not cover
-them; configure the Docker daemon `registry-mirrors` or vendor those images.
+Hub `postgres` and `busybox` still default to Docker Hub. Override them in `.env`
+with `POSTGRES_IMAGE` and `BUSYBOX_IMAGE` (published-images Compose already
+interpolates both). Use a digest-less tag such as `postgres:16` — copying the
+default digest-pinned reference often fails on registry mirrors:
+
+```env
+POSTGRES_IMAGE=registry.example.com/library/postgres:16
+BUSYBOX_IMAGE=registry.example.com/library/busybox:1
+```
+
+Daemon `registry-mirrors` remains an alternative if you leave the vars unset.
 
 `SANDBOX_PROVIDER` defaults to `docker`. The images Compose file runs a sandbox supervisor
 (from the app image, on the internal network only) and pulls `ghcr.io/elie222/rakazo/computer`.
