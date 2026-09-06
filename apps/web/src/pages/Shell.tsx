@@ -418,6 +418,7 @@ export function ShellPage() {
   const [accountSettingsOpen, setAccountSettingsOpen] = useState(false);
   const [messagingSettingsOpen, setMessagingSettingsOpen] = useState(false);
   const [messagingSurfaceEnabled, setMessagingSurfaceEnabled] = useState(false);
+  const [messagingProviders, setMessagingProviders] = useState<string[]>([]);
   const [accountSettingsFocusUsage, setAccountSettingsFocusUsage] = useState(false);
   const [modelsOpen, setModelsOpen] = useState(false);
   const [memorySettingsOpen, setMemorySettingsOpen] = useState(false);
@@ -507,7 +508,10 @@ export function ShellPage() {
     void rpc.messaging
       .status()
       .then((status) => {
-        if (!cancelled) setMessagingSurfaceEnabled(status.enabled);
+        if (!cancelled) {
+          setMessagingSurfaceEnabled(status.enabled);
+          setMessagingProviders(status.providers);
+        }
       })
       .catch(() => undefined);
     return () => {
@@ -3384,6 +3388,7 @@ export function ShellPage() {
                     ? `${window.location.origin}/api/v1/bots/${active.id}/github`
                     : `/api/v1/bots/${active.id}/github`
                 }
+                messageProviders={messagingProviders}
                 saving={savingRoutine}
                 running={runningRoutine}
                 error={routineError}
@@ -3400,9 +3405,10 @@ export function ShellPage() {
                   if (
                     !routineDraft.schedules.length &&
                     !routineDraft.webhookEnabled &&
-                    !routineDraft.githubEnabled
+                    !routineDraft.githubEnabled &&
+                    !routineDraft.messageProvider
                   ) {
-                    setRoutineError(t`Add a schedule, webhook, or GitHub trigger`);
+                    setRoutineError(t`Add a schedule, webhook, GitHub, or message trigger`);
                     return;
                   }
                   const saveRequest = ++routineSaveRequest.current;
@@ -3442,6 +3448,7 @@ export function ShellPage() {
                         active: armOneShot ? true : routineDraft.active,
                         webhookEnabled: routineDraft.webhookEnabled,
                         githubEnabled: routineDraft.githubEnabled,
+                        messageProvider: routineDraft.messageProvider,
                         ...(runAt ? { runAt } : {}),
                       });
                     } else {
@@ -3455,6 +3462,7 @@ export function ShellPage() {
                         notify: true,
                         webhookEnabled: routineDraft.webhookEnabled,
                         githubEnabled: routineDraft.githubEnabled,
+                        messageProvider: routineDraft.messageProvider,
                       });
                     }
                     if (
