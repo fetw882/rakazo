@@ -61,18 +61,19 @@ describe("connected model options", () => {
     ]);
   });
 
-  it("keeps distinct free-form models from legacy same-provider credentials", () => {
+  it("only exposes the free-form model for the credential runtime selects", () => {
     expect(
       connectedModelOptions(
         [
-          credential({ modelId: "private-model-a" }),
-          credential({ id: "credential-2", modelId: "private-model-b" }),
+          credential({ modelId: "private-model-a", isSelectedForProvider: false }),
+          credential({
+            id: "credential-2",
+            modelId: "private-model-b",
+            isSelectedForProvider: true,
+          }),
         ],
         catalog,
       ),
-    ).toEqual([
-      expect.objectContaining({ key: "xai::private-model-a" }),
-      expect.objectContaining({ key: "xai::private-model-b" }),
-    ]);
+    ).toEqual([expect.objectContaining({ key: "xai::private-model-b" })]);
   });
 });

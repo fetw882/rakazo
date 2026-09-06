@@ -722,6 +722,7 @@ export const ModelCredentialSchema = z.object({
   label: z.string(),
   hasKey: z.boolean(),
   isDefault: z.boolean(),
+  isSelectedForProvider: z.boolean().optional(),
   baseUrl: z.string().optional(),
   modelId: z.string().optional(),
   reasoning: z.boolean().optional(),

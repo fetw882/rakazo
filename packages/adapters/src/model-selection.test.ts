@@ -131,17 +131,13 @@ describe("connected model validation", () => {
       validateConnectedModelChoice(catalogPrisma, actor, "xai", "not-a-model"),
     ).resolves.toBe("Unknown model for that provider");
 
-    const customPreferences = [
-      {
-        credential: credential("openai-compatible", "newest-model"),
-        isDefault: true,
-        modelId: "newest-model",
-      },
-      { id: "older-choice" },
-    ];
     const customPrisma = {
       spaceModelPreference: {
-        findFirst: async () => customPreferences.shift() ?? null,
+        findFirst: async () => ({
+          credential: credential("openai-compatible", "private-model"),
+          isDefault: true,
+          modelId: "private-model",
+        }),
       },
     } as unknown as PrismaClient;
     await expect(

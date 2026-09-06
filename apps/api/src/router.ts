@@ -534,6 +534,17 @@ export function createRouter(deps: RouterDeps) {
             })
           : [];
         const ciphertextById = new Map(secrets.map((secret) => [secret.id, secret.ciphertext]));
+        const selectedCredentialIds = new Set(
+          (
+            await Promise.all(
+              [...new Set(rows.map((row) => row.provider))].map((provider) =>
+                findModelCredential(deps.prisma, context.actor, provider),
+              ),
+            )
+          )
+            .filter((credential) => credential !== null)
+            .map((credential) => credential.id),
+        );
         return rows.map((row) => {
           const preference = row.preferences[0];
           const selected = {
@@ -542,12 +553,16 @@ export function createRouter(deps: RouterDeps) {
             defaultModel: preference?.modelId ?? null,
           };
           const ciphertext = ciphertextById.get(row.secretId);
-          if (!ciphertext) return modelCredentialDto(selected);
-          try {
-            return modelCredentialDto(selected, deps.secrets.load(ciphertext, row.secretId));
-          } catch {
-            return modelCredentialDto(selected);
-          }
+          const dto = !ciphertext
+            ? modelCredentialDto(selected)
+            : (() => {
+                try {
+                  return modelCredentialDto(selected, deps.secrets.load(ciphertext, row.secretId));
+                } catch {
+                  return modelCredentialDto(selected);
+                }
+              })();
+          return { ...dto, isSelectedForProvider: selectedCredentialIds.has(row.id) };
         });
       }),
       connect: authed.models.connect.handler(async ({ context, input }) => {

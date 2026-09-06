@@ -1026,6 +1026,11 @@ describeWithDatabase("API authorization and resource isolation", () => {
     expect(
       listed.filter((row) => row.provider === "duplicate-provider").map((row) => row.id),
     ).toEqual([newer.id, older.id]);
+    expect(
+      listed
+        .filter((row) => row.provider === "duplicate-provider")
+        .map((row) => row.isSelectedForProvider),
+    ).toEqual([true, false]);
   });
 
   it("restricts deployment settings to the deployment owner", async () => {

@@ -23,7 +23,9 @@ export function connectedModelOptions(
 ): ConnectedModelOption[] {
   const connected: ConnectedModelOption[] = [];
   const seen = new Set<string>();
-  for (const credential of credentials) {
+  for (const credential of credentials.filter(
+    (candidate) => candidate.isSelectedForProvider !== false,
+  )) {
     const providerModels = catalog.filter(
       (entry) => entry.provider === credential.provider && !entry.placeholder,
     );
